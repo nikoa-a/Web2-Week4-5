@@ -1,7 +1,7 @@
 import catModel from '../models/catModel';
 import {Cat, LocationInput} from '../../types/DBTypes';
 import {MyContext} from '../../types/MyContext';
-import {GraphQLError} from 'graphql';
+import {isLoggedIn} from '../../functions/authorize';
 
 // TODO: create resolvers based on cat.graphql
 // note: when updating or deleting a cat, you need to check if the user is the owner of the cat
@@ -29,10 +29,7 @@ export default {
       args: {input: Omit<Cat, 'id'>},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
+      isLoggedIn(context);
       args.input.owner = context.userdata?.user.id;
       return await catModel.create(args.input);
     },
@@ -41,10 +38,7 @@ export default {
       args: {id: string; input: Omit<Cat, 'id'>},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
+      isLoggedIn(context);
       if (context.userdata?.user.role !== 'admin') {
         const filter = {_id: args.id, owner: context.userdata?.user.id};
         return await catModel.findOneAndUpdate(filter, args.input, {new: true});
@@ -59,10 +53,7 @@ export default {
       args: {id: string},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
+      isLoggedIn(context);
       if (context.userdata?.user.role !== 'admin') {
         const filter = {_id: args.id, owner: context.userdata?.user.id};
         return await catModel.findOneAndDelete(filter);

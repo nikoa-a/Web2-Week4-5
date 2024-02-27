@@ -2,7 +2,7 @@ import {Cat, User, UserInput} from '../../types/DBTypes';
 import fetchData from '../../functions/fetchData';
 import {LoginResponse, UserResponse} from '../../types/MessageTypes';
 import {MyContext} from '../../types/MyContext';
-import {GraphQLError} from 'graphql';
+import {isAdmin, isLoggedIn} from '../../functions/authorize';
 
 // TODO: create resolvers based on user.graphql
 // note: when updating or deleting a user don't send id to the auth server, it will get it from the token. So token needs to be sent with the request to the auth server
@@ -62,10 +62,7 @@ export default {
       args: {user: UserInput},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
+      isLoggedIn(context);
       return await fetchData<UserResponse>(
         `${process.env.AUTH_URL}/users/${context.userdata?.user.id}`,
         {
@@ -83,10 +80,7 @@ export default {
       _args: {id: string},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
+      isLoggedIn(context);
       return await fetchData<UserResponse>(
         `${process.env.AUTH_URL}/users/${context.userdata?.user.id}`,
         {
@@ -103,14 +97,7 @@ export default {
       args: {user: UserInput},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
-      // Check if user is admin
-      if (context.userdata.user.role !== 'admin') {
-        throw new GraphQLError('Not an admin');
-      }
+      isAdmin(context);
       return await fetchData<UserResponse>(
         `${process.env.AUTH_URL}/users/${context.userdata?.user.id}`,
         {
@@ -127,14 +114,7 @@ export default {
       args: {id: string},
       context: MyContext,
     ) => {
-      // Check if user is logged in
-      if (!context.userdata || !context.userdata.user) {
-        throw new GraphQLError('Not logged in');
-      }
-      // Check if user is admin
-      if (context.userdata.user.role !== 'admin') {
-        throw new GraphQLError('Not an admin');
-      }
+      isAdmin(context);
       return await fetchData<UserResponse>(
         `${process.env.AUTH_URL}/users/${args.id}`,
         {
