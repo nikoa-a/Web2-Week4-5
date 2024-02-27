@@ -2,6 +2,10 @@
 
 Add authentication and brute force prevention to last weeks assignment.
 
+## Tests
+
+<img src="Week4-5_tests.jpg">
+
 ## Getting started
 
 - Clone this repo
