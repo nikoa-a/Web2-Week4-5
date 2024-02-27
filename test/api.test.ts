@@ -1,4 +1,3 @@
-/*
 import app from '../src/app';
 import {
   adminDeleteUser,
@@ -303,4 +302,3 @@ describe('Testing graphql api', () => {
   //   }
   // }, 15000);
 });
-*/
